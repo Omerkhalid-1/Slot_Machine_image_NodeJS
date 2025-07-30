@@ -64,8 +64,43 @@ const server = http.createServer((req, res) => {
             }
         });
 
-        return; // exit here so the rest of the file serving logic doesn't run
+        return; 
     }
+    // Serve HTML or fallback on GET
+let filePath = path.join(__dirname,
+    req.url === '/' ? 'views/index.html' : req.url);
+
+const ext = path.extname(filePath);
+let contentType;
+
+switch (ext) {
+    case '.css':
+        contentType = 'text/css';
+        break;
+    case '.js':
+        contentType = 'text/javascript';
+        break;
+    case '.json':
+        contentType = 'application/json';
+        break;
+    case '.png':
+        contentType = 'image/png';
+        break;
+    case '.jpg':
+        contentType = 'image/jpeg';
+        break;
+    case '.html':
+        contentType = 'text/html';
+        break;
+    default:
+        contentType = 'text/html';
+        filePath += '.html';
+}
+
+fs.existsSync(filePath)
+    ? serveFile(filePath, contentType, res)
+    : serveFile(path.join(__dirname, 'views/404.html'), 'text/html', res);
+
 });
 
 server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
