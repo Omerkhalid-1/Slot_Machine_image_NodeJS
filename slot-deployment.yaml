@@ -1,10 +1,11 @@
-#v1
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: slot-app
+  labels:
+    app: slot
 spec:
-  replicas: 1
+  replicas: 2  
   selector:
     matchLabels:
       app: slot
@@ -13,8 +14,39 @@ spec:
       labels:
         app: slot
     spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: node-role.kubernetes.io/control-plane
+                operator: DoesNotExist
       containers:
         - name: slot-container
-          image: omerkhalid/slot-app:stage
+          image: omerkhalid/slot-machine:stage
           ports:
             - containerPort: 3500
+              name: http
+          livenessProbe:
+            tcpSocket:
+              port: 3500
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            tcpSocket:
+              port: 3500
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              memory: "256Mi"
+              cpu: "200m"
+          env:
+            - name: NODE_ENV
+              value: "production"
+            - name: PORT
+              value: "3500"
+      restartPolicy: Always
