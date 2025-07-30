@@ -1,0 +1,20 @@
+#v1
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: slot-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: slot
+  template:
+    metadata:
+      labels:
+        app: slot
+    spec:
+      containers:
+        - name: slot-container
+          image: omerkhalid/slot-app:stage
+          ports:
+            - containerPort: 3500

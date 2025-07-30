@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: slot-service
+spec:
+  selector:
+    app: slot
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 3500
+  type: NodePort 
